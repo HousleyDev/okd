@@ -1,15 +1,11 @@
-# Node.js version
-FROM node:6.9.2
+FROM busybox:latest
+ENV PORT=8000
 
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+ADD index.html /www/index.html
 
-# get the npm modules that need to be installed
-COPY package.json /usr/src/app/
+# EXPOSE $PORT
 
-# install npm modules
-RUN npm install
+HEALTHCHECK CMD nc -z localhost $PORT
 
-# copy the source files from host to container
-COPY . /usr/src/app
+# Create a basic webserver and run it until the container is stopped
+CMD echo "httpd started" && trap "exit 0;" TERM INT; httpd -v -p $PORT -h /www -f & wait
